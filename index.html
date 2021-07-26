@@ -1,0 +1,72 @@
+<!doctype html>
+
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>ARES: StandUP shuffler</title>
+  <link rel="stylesheet" href="https://unpkg.com/sakura.css/css/sakura.css" type="text/css">
+</head>
+
+<body>
+
+    <div id="form">
+        <h1>Speakers</h1>
+        <form method="GET" target="_self">
+            <textarea name="speakers" id="speakers" rows="8" cols="40"></textarea>
+            <input type="submit" value="Shuffle" />
+        </form>
+    </div>
+
+    <div id="content">
+    </div>
+
+
+    <script>
+        window.onload = function() {
+            var query = window.location.search.substring(1);
+            var all_vars = query.split('&');
+
+            var speakers = "";
+            for (var i = 0; i < all_vars.length; i++) {
+                var pair = all_vars[i].split('=');
+                if (decodeURIComponent(pair[0]) == 'speakers') {
+                    speakers = decodeURIComponent(pair[1]).replace(/\+/g, ' ');
+                    break;
+                }
+            }
+            if (speakers.length == 0) {
+                return;
+            }
+            speakers = speakers.split(/\r?\n/).filter(function(el) {return el != null && el.length > 0; });
+            if (speakers.length == 0) {
+                return;
+            }
+
+            document.getElementById("speakers").innerHTML = speakers.join("\n");
+
+            shuffle(speakers);
+
+            var order_display = '<h1>Order for ' + new Date().toJSON().slice(0,10) + '</h1>' +
+                                '<ul style="list-style: none">'
+            for (var i = 0; i < speakers.length; i++) {
+                order_display += '<li>' + i + " " + speakers[i] + '</li>';
+            }
+            order_display += '</ul>';
+            document.getElementById("content").innerHTML = order_display;
+        }
+
+        function shuffle(array) {
+            var currentIndex = array.length,  randomIndex;
+            while (0 !== currentIndex) {
+                randomIndex = Math.floor(Math.random() * currentIndex);
+                currentIndex--;
+                [array[currentIndex], array[randomIndex]] = [
+                array[randomIndex], array[currentIndex]];
+            }
+            return array;
+        }
+    </script>
+</body>
+</html>
